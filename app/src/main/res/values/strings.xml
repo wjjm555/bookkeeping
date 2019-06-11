@@ -1,3 +1,26 @@
 <resources>
-    <string name="app_name">MyBookKeepingApplication</string>
+    <string name="app_name">7家租客</string>
+    <string name="title_activity_list">7家租客花费清单</string>
+
+    <string name="fix_data">修改数据</string>
+    <string name="statistics_data">统计数据</string>
+
+    <string name="title_add">增加花费</string>
+    <string name="title_fix">修改数据</string>
+    <string name="title_detail">花费详情</string>
+
+    <string name="hint_name">花费名称</string>
+    <string name="hint_spend">花费金额</string>
+
+    <string name="btn_add">确认添加</string>
+    <string name="btn_fix">确认修改</string>
+    <string name="btn_delete">删除</string>
+
+    <string name="check_settled">已结算</string>
+
+    <string name="percapita">人均花费：%.2f 元</string>
+
+    <string name="tips_less_than_one">选中人数不能小于1</string>
+
+    <string name="not_empty">%s不能为空</string>
 </resources>
