@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:gravity="center"
-            android:text="@string/check_settled"
+            android:text="@string/settled"
             android:textSize="30sp" />
 
         <Button
@@ -40,7 +40,7 @@
 
 
     <TextView
-        android:id="@+id/data"
+        android:id="@+id/date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -87,4 +87,14 @@
         android:gravity="center"
         android:textColor="@android:color/black"
         android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/settledText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:textSize="30sp"
+        android:visibility="gone" />
 </LinearLayout>

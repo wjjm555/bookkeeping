@@ -1,6 +1,8 @@
 package com.qinggan.mybookkeepingapplication.model;
 
 
+import com.qinggan.mybookkeepingapplication.utils.CalculationUtil;
+
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
@@ -16,8 +18,11 @@ public class Record {
     @Id(autoincrement = true)
     private Long id;
 
-    @Index(name = "date", unique = true)
+    @Index(name = "date")
     private long date;
+    
+    @Index(name = "type")
+    private int type;
 
     private float spend;
 
@@ -29,13 +34,14 @@ public class Record {
     private List<Integer> members = new ArrayList<>();
 
     @Transient
-    private float percapita;
+    private float average;
 
-    @Generated(hash = 639859102)
-    public Record(Long id, long date, float spend, String name, boolean isSettled,
+    @Generated(hash = 336765368)
+    public Record(Long id, long date, int type, float spend, String name, boolean isSettled,
             List<Integer> members) {
         this.id = id;
         this.date = date;
+        this.type = type;
         this.spend = spend;
         this.name = name;
         this.isSettled = isSettled;
@@ -54,7 +60,7 @@ public class Record {
                 ", name='" + name + '\'' +
                 ", spend='" + spend + '\'' +
                 ", isSettled='" + isSettled + '\'' +
-                ", percapita='" + percapita + '\'' +
+                ", average='" + average + '\'' +
                 ", members='" + members.toString() + '\'' +
                 '}';
     }
@@ -105,5 +111,19 @@ public class Record {
 
     public void setMembers(List<Integer> members) {
         this.members = members;
+    }
+
+    public float getAverage() {
+        if (average <= 0)
+            average = CalculationUtil.getInstance().getAverageSpend(getSpend(), getMembers().size());
+        return average;
+    }
+
+    public int getType() {
+        return this.type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

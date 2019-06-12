@@ -29,10 +29,11 @@ public class RecordDao extends AbstractDao<Record, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Date = new Property(1, long.class, "date", false, "DATE");
-        public final static Property Spend = new Property(2, float.class, "spend", false, "SPEND");
-        public final static Property Name = new Property(3, String.class, "name", false, "NAME");
-        public final static Property IsSettled = new Property(4, boolean.class, "isSettled", false, "IS_SETTLED");
-        public final static Property Members = new Property(5, String.class, "members", false, "MEMBERS");
+        public final static Property Type = new Property(2, int.class, "type", false, "TYPE");
+        public final static Property Spend = new Property(3, float.class, "spend", false, "SPEND");
+        public final static Property Name = new Property(4, String.class, "name", false, "NAME");
+        public final static Property IsSettled = new Property(5, boolean.class, "isSettled", false, "IS_SETTLED");
+        public final static Property Members = new Property(6, String.class, "members", false, "MEMBERS");
     }
 
     private final MemberConvert membersConverter = new MemberConvert();
@@ -51,13 +52,16 @@ public class RecordDao extends AbstractDao<Record, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"RECORD\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"DATE\" INTEGER NOT NULL ," + // 1: date
-                "\"SPEND\" REAL NOT NULL ," + // 2: spend
-                "\"NAME\" TEXT," + // 3: name
-                "\"IS_SETTLED\" INTEGER NOT NULL ," + // 4: isSettled
-                "\"MEMBERS\" TEXT);"); // 5: members
+                "\"TYPE\" INTEGER NOT NULL ," + // 2: type
+                "\"SPEND\" REAL NOT NULL ," + // 3: spend
+                "\"NAME\" TEXT," + // 4: name
+                "\"IS_SETTLED\" INTEGER NOT NULL ," + // 5: isSettled
+                "\"MEMBERS\" TEXT);"); // 6: members
         // Add Indexes
-        db.execSQL("CREATE UNIQUE INDEX " + constraint + "date ON \"RECORD\"" +
+        db.execSQL("CREATE INDEX " + constraint + "date ON \"RECORD\"" +
                 " (\"DATE\" ASC);");
+        db.execSQL("CREATE INDEX " + constraint + "type ON \"RECORD\"" +
+                " (\"TYPE\" ASC);");
     }
 
     /** Drops the underlying database table. */
@@ -75,17 +79,18 @@ public class RecordDao extends AbstractDao<Record, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindLong(2, entity.getDate());
-        stmt.bindDouble(3, entity.getSpend());
+        stmt.bindLong(3, entity.getType());
+        stmt.bindDouble(4, entity.getSpend());
  
         String name = entity.getName();
         if (name != null) {
-            stmt.bindString(4, name);
+            stmt.bindString(5, name);
         }
-        stmt.bindLong(5, entity.getIsSettled() ? 1L: 0L);
+        stmt.bindLong(6, entity.getIsSettled() ? 1L: 0L);
  
         List members = entity.getMembers();
         if (members != null) {
-            stmt.bindString(6, membersConverter.convertToDatabaseValue(members));
+            stmt.bindString(7, membersConverter.convertToDatabaseValue(members));
         }
     }
 
@@ -98,17 +103,18 @@ public class RecordDao extends AbstractDao<Record, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindLong(2, entity.getDate());
-        stmt.bindDouble(3, entity.getSpend());
+        stmt.bindLong(3, entity.getType());
+        stmt.bindDouble(4, entity.getSpend());
  
         String name = entity.getName();
         if (name != null) {
-            stmt.bindString(4, name);
+            stmt.bindString(5, name);
         }
-        stmt.bindLong(5, entity.getIsSettled() ? 1L: 0L);
+        stmt.bindLong(6, entity.getIsSettled() ? 1L: 0L);
  
         List members = entity.getMembers();
         if (members != null) {
-            stmt.bindString(6, membersConverter.convertToDatabaseValue(members));
+            stmt.bindString(7, membersConverter.convertToDatabaseValue(members));
         }
     }
 
@@ -122,10 +128,11 @@ public class RecordDao extends AbstractDao<Record, Long> {
         Record entity = new Record( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getLong(offset + 1), // date
-            cursor.getFloat(offset + 2), // spend
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // name
-            cursor.getShort(offset + 4) != 0, // isSettled
-            cursor.isNull(offset + 5) ? null : membersConverter.convertToEntityProperty(cursor.getString(offset + 5)) // members
+            cursor.getInt(offset + 2), // type
+            cursor.getFloat(offset + 3), // spend
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // name
+            cursor.getShort(offset + 5) != 0, // isSettled
+            cursor.isNull(offset + 6) ? null : membersConverter.convertToEntityProperty(cursor.getString(offset + 6)) // members
         );
         return entity;
     }
@@ -134,10 +141,11 @@ public class RecordDao extends AbstractDao<Record, Long> {
     public void readEntity(Cursor cursor, Record entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setDate(cursor.getLong(offset + 1));
-        entity.setSpend(cursor.getFloat(offset + 2));
-        entity.setName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setIsSettled(cursor.getShort(offset + 4) != 0);
-        entity.setMembers(cursor.isNull(offset + 5) ? null : membersConverter.convertToEntityProperty(cursor.getString(offset + 5)));
+        entity.setType(cursor.getInt(offset + 2));
+        entity.setSpend(cursor.getFloat(offset + 3));
+        entity.setName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setIsSettled(cursor.getShort(offset + 5) != 0);
+        entity.setMembers(cursor.isNull(offset + 6) ? null : membersConverter.convertToEntityProperty(cursor.getString(offset + 6)));
      }
     
     @Override

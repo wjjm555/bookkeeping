@@ -1,6 +1,6 @@
 package com.qinggan.mybookkeepingapplication.utils;
 
-import android.util.Log;
+import java.math.BigDecimal;
 
 public class CalculationUtil {
 
@@ -13,8 +13,16 @@ public class CalculationUtil {
     }
 
     public float getAverageSpend(float total, int num) {
-        float price = total / num;
-        Log.w("CJM", "getAverageSpend:" + price);
-        return (float) (Math.round(price * 100) / 100.00);
+        if (num > 0) {
+            float price = total / num;
+            return (float) (Math.round(price * 100) / 100.00);
+        }
+        return total;
+    }
+
+    public float add(float a, float b) {
+        BigDecimal ab = new BigDecimal(a);
+        BigDecimal bb = new BigDecimal(b);
+        return ab.add(bb).floatValue();
     }
 }

@@ -49,6 +49,13 @@ public class DBUtil {
         return daoSession.loadAll(Record.class);
     }
 
+    public List<Record> loadRecordWithSection(long start, long end) {
+        QueryBuilder<Record> qb = daoSession.queryBuilder(Record.class);
+        QueryBuilder<Record> recordQueryBuilder = qb.where(RecordDao.Properties.Date.between(start, end)).orderAsc(RecordDao.Properties.Date);
+        List<Record> records = recordQueryBuilder.list();
+        return records;
+    }
+
     public Record loadRecordById(long id) {
         QueryBuilder<Record> qb = daoSession.queryBuilder(Record.class);
         QueryBuilder<Record> recordQueryBuilder = qb.where(RecordDao.Properties.Id.eq(id));

@@ -3,6 +3,7 @@ package com.qinggan.mybookkeepingapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -10,12 +11,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.qinggan.mybookkeepingapplication.adapters.ListAdapter;
 import com.qinggan.mybookkeepingapplication.model.Record;
 import com.qinggan.mybookkeepingapplication.utils.DBUtil;
+import com.qinggan.mybookkeepingapplication.views.MyRecyclerView;
 
-public class ListActivity extends AppCompatActivity implements View.OnClickListener {
+public class ListActivity extends AppCompatActivity implements View.OnClickListener, MyRecyclerView.OnItemClickListener {
 
-    private RecyclerView recyclerView;
+    private MyRecyclerView recyclerView;
+
+    private ListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,15 +30,15 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(toolbar);
         findViewById(R.id.fab).setOnClickListener(this);
         recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter = new ListAdapter());
+        recyclerView.setOnItemClickListener(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        for (Record record : DBUtil.getInstance().loadAllRecord()) {
-            Log.w("CJM", "Record:" + record);
-        }
+        adapter.notifyDataSetChangedByDB();
     }
 
     @Override
@@ -44,14 +49,12 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.statistics:
-
-
+                startActivity(new Intent(this, SettlementActivity.class));
                 break;
             case R.id.fix:
-                startActivityWithType(DetailActivity.TYPE_FIX,2);
+                startActivityWithType(DetailActivity.TYPE_FIX, 0);
                 break;
         }
 
@@ -78,5 +81,17 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra(DetailActivity.TYPE_KEY, type);
         intent.putExtra(DetailActivity.ID_KEY, id);
         startActivity(intent);
+    }
+
+    @Override
+    public void onItemClick(RecyclerView recyclerView, View item, int position) {
+        Record record = adapter.getItem(position);
+        if (record != null)
+            startActivityWithType(DetailActivity.TYPE_DETAIL, record.getId());
+    }
+
+    @Override
+    public void onItemLongClick(RecyclerView recyclerView, View item, int position) {
+
     }
 }

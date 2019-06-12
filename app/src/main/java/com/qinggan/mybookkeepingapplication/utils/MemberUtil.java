@@ -53,4 +53,10 @@ public class MemberUtil {
         return memberList;
     }
 
+    public void clearMemberSpend() {
+        for (Member member : memberList) {
+            member.setSpend(0);
+        }
+    }
+
 }
