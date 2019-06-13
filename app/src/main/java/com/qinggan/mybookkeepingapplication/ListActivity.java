@@ -39,36 +39,6 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setOnItemClickListener(this);
     }
 
-    private void test() {
-        for (int i = 0; i < 10000; ++i) {
-            Record record = new Record();
-            record.setDate(System.currentTimeMillis());
-            record.setName("测试" + i);
-            record.setSpend(System.currentTimeMillis() % 100f);
-            record.setMembers(testMembers(i));
-            record.setIsSettled(false);
-            DBUtil.getInstance().insertRecord(record, new DBUtil.DBWriteListener() {
-                @Override
-                public void onWriteBack(boolean success) {
-
-                }
-            });
-
-        }
-    }
-
-    private List<Integer> testMembers(int num) {
-        List<Integer> integers = new ArrayList<>();
-
-        for (int i = 0; i < num % MemberUtil.getInstance().getMemberList().size(); ++i) {
-            int member = (int) (System.currentTimeMillis() % MemberUtil.getInstance().getMemberList().size());
-            if (!integers.contains(member))
-                integers.add(member);
-        }
-
-        return integers;
-    }
-
     @Override
     protected void onResume() {
         super.onResume();

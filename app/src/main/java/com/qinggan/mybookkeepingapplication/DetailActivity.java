@@ -1,5 +1,6 @@
 package com.qinggan.mybookkeepingapplication;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -162,12 +164,11 @@ public class DetailActivity extends AppCompatActivity implements TextWatcher, Vi
         return true;
     }
 
-
     private void initAdd() {
         setTitle(R.string.title_add);
         commit.setText(R.string.btn_add);
         setDate(System.currentTimeMillis());
-
+        nameEdit.requestFocus();
     }
 
     private void initFix() {
@@ -195,6 +196,7 @@ public class DetailActivity extends AppCompatActivity implements TextWatcher, Vi
                 spendEdit.setText(String.valueOf(record.getSpend()));
                 checkbox.setSelectedMember(record.getMembers());
                 settled.setChecked(record.getIsSettled());
+                nameEdit.requestFocus();
             }
         });
     }
@@ -314,7 +316,7 @@ public class DetailActivity extends AppCompatActivity implements TextWatcher, Vi
                     });
                 break;
             case R.id.date:
-                if (type == TYPE_FIX) {
+                if (type != TYPE_DETAIL) {
                     DialogUtil.getInstance().showDatePickerDialog(this, dataLong, new DialogUtil.OnDateSelectedListener() {
                         @Override
                         public void onDateSelected(long date) {
