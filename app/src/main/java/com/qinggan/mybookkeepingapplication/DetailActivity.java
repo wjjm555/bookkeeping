@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +18,7 @@ import android.widget.TextView;
 import com.qinggan.mybookkeepingapplication.model.Record;
 import com.qinggan.mybookkeepingapplication.utils.CalculationUtil;
 import com.qinggan.mybookkeepingapplication.utils.DBUtil;
-import com.qinggan.mybookkeepingapplication.utils.DatePickerDialogUtil;
+import com.qinggan.mybookkeepingapplication.utils.DialogUtil;
 import com.qinggan.mybookkeepingapplication.views.MyCheckBox;
 import com.rey.material.app.Dialog;
 
@@ -181,17 +180,23 @@ public class DetailActivity extends AppCompatActivity implements TextWatcher, Vi
         spendEdit.setEnabled(true);
         checkbox.setEnabled(true);
 
-        record = DBUtil.getInstance().loadRecordById(id);
-        if (record == null) {
-            finish();
-            return;
-        }
+        DBUtil.getInstance().loadRecordById(id, new DBUtil.DBReadListener<Record>() {
 
-        setDate(record.getDate());
-        nameEdit.setText(record.getName());
-        spendEdit.setText(String.valueOf(record.getSpend()));
-        checkbox.setSelectedMember(record.getMembers());
-        settled.setChecked(record.getIsSettled());
+            @Override
+            public void onReadBack(Record data) {
+                record = data;
+                if (record == null) {
+                    finish();
+                    return;
+                }
+
+                setDate(record.getDate());
+                nameEdit.setText(record.getName());
+                spendEdit.setText(String.valueOf(record.getSpend()));
+                checkbox.setSelectedMember(record.getMembers());
+                settled.setChecked(record.getIsSettled());
+            }
+        });
     }
 
     private void initDetail() {
@@ -202,18 +207,25 @@ public class DetailActivity extends AppCompatActivity implements TextWatcher, Vi
         spendEdit.setEnabled(false);
         checkbox.setEnabled(false);
 
-        record = DBUtil.getInstance().loadRecordById(id);
-        if (record == null) {
-            finish();
-            return;
-        }
+        DBUtil.getInstance().loadRecordById(id, new DBUtil.DBReadListener<Record>() {
 
-        setDate(record.getDate());
-        nameEdit.setText(record.getName());
-        spendEdit.setText(String.valueOf(record.getSpend()));
-        checkbox.setSelectedMember(record.getMembers());
-        settled.setChecked(record.getIsSettled());
-        settledText.setText(getString(record.getIsSettled() ? R.string.check_settled : R.string.check_not_settle));
+            @Override
+            public void onReadBack(Record data) {
+                record = data;
+                if (record == null) {
+                    finish();
+                    return;
+                }
+
+                setDate(record.getDate());
+                nameEdit.setText(record.getName());
+                spendEdit.setText(String.valueOf(record.getSpend()));
+                checkbox.setSelectedMember(record.getMembers());
+                settled.setChecked(record.getIsSettled());
+                settledText.setText(getString(record.getIsSettled() ? R.string.check_settled : R.string.check_not_settle));
+            }
+        });
+
     }
 
     private void setAverageText(String totalStr) {
@@ -267,9 +279,13 @@ public class DetailActivity extends AppCompatActivity implements TextWatcher, Vi
                         record.setName(nameEdit.getText().toString());
                         record.setSpend(spend);
                         record.setMembers(checkbox.getSelectedMember());
-                        record.setIsSettled(settled.isChecked());
-                        DBUtil.getInstance().insertRecord(record);
-                        finish();
+                        record.setIsSettled(false);
+                        DBUtil.getInstance().insertRecord(record, new DBUtil.DBWriteListener() {
+                            @Override
+                            public void onWriteBack(boolean success) {
+                                finish();
+                            }
+                        });
                         break;
                     case TYPE_FIX:
                         if (record != null) {
@@ -278,20 +294,28 @@ public class DetailActivity extends AppCompatActivity implements TextWatcher, Vi
                             record.setSpend(spend);
                             record.setMembers(checkbox.getSelectedMember());
                             record.setIsSettled(settled.isChecked());
-                            DBUtil.getInstance().updateRecord(record);
+                            DBUtil.getInstance().updateRecord(record, new DBUtil.DBWriteListener() {
+                                @Override
+                                public void onWriteBack(boolean success) {
+                                    finish();
+                                }
+                            });
                         }
-                        finish();
                         break;
                 }
                 break;
             case R.id.delete:
                 if (record != null)
-                    DBUtil.getInstance().deleteRecord(record);
-                finish();
+                    DBUtil.getInstance().deleteRecord(record, new DBUtil.DBWriteListener() {
+                        @Override
+                        public void onWriteBack(boolean success) {
+                            finish();
+                        }
+                    });
                 break;
             case R.id.date:
                 if (type == TYPE_FIX) {
-                    DatePickerDialogUtil.getInstance().showDatePickerDialog(this, dataLong, new DatePickerDialogUtil.OnDateSelectedListener() {
+                    DialogUtil.getInstance().showDatePickerDialog(this, dataLong, new DialogUtil.OnDateSelectedListener() {
                         @Override
                         public void onDateSelected(long date) {
                             setDate(date);

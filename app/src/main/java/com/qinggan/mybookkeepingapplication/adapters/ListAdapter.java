@@ -22,7 +22,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.Holder> {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-    private List<Record> data = new ArrayList<>();
+    private List<Record> records = new ArrayList<>();
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -45,27 +45,54 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.Holder> {
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return records.size();
     }
 
     public Record getItem(int position) {
-        return data.get(position);
+        return records.get(position);
     }
 
-    public void notifyDataSetChangedByDB() {
-        data.clear();
-        data.addAll(DBUtil.getInstance().loadAllRecord());
-        super.notifyDataSetChanged();
+    public void notifyDataSetChangedByDB(final NotifyListener listener) {
+        DBUtil.getInstance().loadAllRecord(new DBUtil.DBReadListener<List<Record>>() {
+            @Override
+            public void onReadBack(List<Record> data) {
+                records.clear();
+                records.addAll(data);
+                ListAdapter.this.notifyDataSetChanged();
+                if (listener != null) listener.onNotifySuccess();
+            }
+        });
     }
 
-    public void notifyDataSetChangedWithSection(long start, long end) {
-        data.clear();
-        data.addAll(DBUtil.getInstance().loadRecordWithSection(start, end));
-        super.notifyDataSetChanged();
+    public void notifyDataSetChangedWithSection(long start, long end, final NotifyListener listener) {
+        DBUtil.getInstance().loadRecordWithSection(start, end, new DBUtil.DBReadListener<List<Record>>() {
+
+            @Override
+            public void onReadBack(List<Record> data) {
+                records.clear();
+                records.addAll(data);
+                ListAdapter.this.notifyDataSetChanged();
+                if (listener != null) listener.onNotifySuccess();
+            }
+        });
+
+    }
+
+    public void notifyDataSetChangedWithSection(long start, long end, boolean settlement, final NotifyListener listener) {
+        DBUtil.getInstance().loadRecordWithSection(start, end, settlement, new DBUtil.DBReadListener<List<Record>>() {
+
+            @Override
+            public void onReadBack(List<Record> data) {
+                records.clear();
+                records.addAll(data);
+                ListAdapter.this.notifyDataSetChanged();
+                if (listener != null) listener.onNotifySuccess();
+            }
+        });
     }
 
     public List<Record> getData() {
-        return data;
+        return records;
     }
 
     private String getMemberString(List<Integer> membersId) {
@@ -89,5 +116,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.Holder> {
             settled = itemView.findViewById(R.id.settled);
             average = itemView.findViewById(R.id.average);
         }
+    }
+
+
+    public interface NotifyListener {
+
+        void onNotifySuccess();
+
     }
 }

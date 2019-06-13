@@ -14,7 +14,11 @@ import android.view.View;
 import com.qinggan.mybookkeepingapplication.adapters.ListAdapter;
 import com.qinggan.mybookkeepingapplication.model.Record;
 import com.qinggan.mybookkeepingapplication.utils.DBUtil;
+import com.qinggan.mybookkeepingapplication.utils.MemberUtil;
 import com.qinggan.mybookkeepingapplication.views.MyRecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListActivity extends AppCompatActivity implements View.OnClickListener, MyRecyclerView.OnItemClickListener {
 
@@ -35,10 +39,40 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setOnItemClickListener(this);
     }
 
+    private void test() {
+        for (int i = 0; i < 10000; ++i) {
+            Record record = new Record();
+            record.setDate(System.currentTimeMillis());
+            record.setName("测试" + i);
+            record.setSpend(System.currentTimeMillis() % 100f);
+            record.setMembers(testMembers(i));
+            record.setIsSettled(false);
+            DBUtil.getInstance().insertRecord(record, new DBUtil.DBWriteListener() {
+                @Override
+                public void onWriteBack(boolean success) {
+
+                }
+            });
+
+        }
+    }
+
+    private List<Integer> testMembers(int num) {
+        List<Integer> integers = new ArrayList<>();
+
+        for (int i = 0; i < num % MemberUtil.getInstance().getMemberList().size(); ++i) {
+            int member = (int) (System.currentTimeMillis() % MemberUtil.getInstance().getMemberList().size());
+            if (!integers.contains(member))
+                integers.add(member);
+        }
+
+        return integers;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        adapter.notifyDataSetChangedByDB();
+        adapter.notifyDataSetChangedByDB(null);
     }
 
     @Override
@@ -52,9 +86,6 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         switch (item.getItemId()) {
             case R.id.statistics:
                 startActivity(new Intent(this, SettlementActivity.class));
-                break;
-            case R.id.fix:
-                startActivityWithType(DetailActivity.TYPE_FIX, 0);
                 break;
         }
 
@@ -70,13 +101,13 @@ public class ListActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void startActivityWithType(int type) {
+    private void startActivityWithType(int type) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.TYPE_KEY, type);
         startActivity(intent);
     }
 
-    public void startActivityWithType(int type, long id) {
+    private void startActivityWithType(int type, long id) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.TYPE_KEY, type);
         intent.putExtra(DetailActivity.ID_KEY, id);

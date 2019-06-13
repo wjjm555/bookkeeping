@@ -1,28 +1,45 @@
 package com.qinggan.mybookkeepingapplication.utils;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 
 import com.qinggan.mybookkeepingapplication.R;
 import com.rey.material.app.DatePickerDialog;
 
 import java.util.Calendar;
-import java.util.Date;
 
-public class DatePickerDialogUtil {
+public class DialogUtil {
 
     private DatePickerDialog datePickerDialog;
 
     private static class InnerHolder {
-        private static final DatePickerDialogUtil INSTANCE = new DatePickerDialogUtil();
+        private static final DialogUtil INSTANCE = new DialogUtil();
     }
 
-    public static DatePickerDialogUtil getInstance() {
-        return DatePickerDialogUtil.InnerHolder.INSTANCE;
+    public static DialogUtil getInstance() {
+        return DialogUtil.InnerHolder.INSTANCE;
     }
 
-    private DatePickerDialogUtil() {
+    private DialogUtil() {
+
+    }
+
+    public void showDatePickerDialog(Context context, long date, final OnDateSelectedListener listener) {
+        initDialog(context);
+        datePickerDialog.date(date).positiveActionClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                datePickerDialog.dismiss();
+                if (listener != null) listener.onDateSelected(datePickerDialog.getDate());
+            }
+        }).show();
+    }
+
+    public void showLoadingDialog() {
+
+    }
+
+    public void hideLoadingDialog() {
 
     }
 
@@ -47,16 +64,6 @@ public class DatePickerDialogUtil {
                 });
     }
 
-    public void showDatePickerDialog(Context context, long date, final OnDateSelectedListener listener) {
-        initDialog(context);
-        datePickerDialog.date(date).positiveActionClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                datePickerDialog.dismiss();
-                if (listener != null) listener.onDateSelected(datePickerDialog.getDate());
-            }
-        }).show();
-    }
 
     public interface OnDateSelectedListener {
         void onDateSelected(long date);

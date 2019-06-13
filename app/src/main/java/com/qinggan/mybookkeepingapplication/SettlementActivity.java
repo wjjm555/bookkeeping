@@ -4,19 +4,19 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.qinggan.mybookkeepingapplication.adapters.ListAdapter;
 import com.qinggan.mybookkeepingapplication.model.Member;
 import com.qinggan.mybookkeepingapplication.model.Record;
 import com.qinggan.mybookkeepingapplication.utils.CalculationUtil;
-import com.qinggan.mybookkeepingapplication.utils.DatePickerDialogUtil;
+import com.qinggan.mybookkeepingapplication.utils.DBUtil;
+import com.qinggan.mybookkeepingapplication.utils.DialogUtil;
 import com.qinggan.mybookkeepingapplication.utils.MemberUtil;
 import com.qinggan.mybookkeepingapplication.views.MyRecyclerView;
 
@@ -38,7 +38,7 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
 
     private TextView title;
 
-    private CheckBox all, settlement, nosettlement;
+    private RadioButton all, settlementButton, nosettlementButton;
 
     private long startDate, endDate;
 
@@ -60,14 +60,12 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         endText = findViewById(R.id.end);
         title = findViewById(R.id.title);
         all = findViewById(R.id.all);
-        settlement = findViewById(R.id.settlement);
-        nosettlement = findViewById(R.id.nosettlement);
+        settlementButton = findViewById(R.id.settlement);
+        nosettlementButton = findViewById(R.id.nosettlement);
 
         all.setOnCheckedChangeListener(this);
-        settlement.setOnCheckedChangeListener(this);
-        nosettlement.setOnCheckedChangeListener(this);
-
-        all.setChecked(true);
+        settlementButton.setOnCheckedChangeListener(this);
+        nosettlementButton.setOnCheckedChangeListener(this);
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -83,8 +81,7 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH) + 1, 0, 0, 0);
         setEndText(calendar.getTimeInMillis());
 
-        adapter.notifyDataSetChangedWithSection(startDate, endDate);
-        showContent();
+        all.setChecked(true);
     }
 
     private void setStartText(long date) {
@@ -122,8 +119,26 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    private void setSettlement(boolean settlement) {
-//TODO
+    private void setSettlement(final boolean settlement) {
+        boolean changed = false;
+        for (Record record : adapter.getData()) {
+            if (record.getIsSettled() != settlement) {
+                record.setIsSettled(settlement);
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            DBUtil.getInstance().updateRecords(adapter.getData(), new DBUtil.DBWriteListener() {
+                @Override
+                public void onWriteBack(boolean success) {
+                    if (success)
+                        if (settlement) settlementButton.setChecked(true);
+                        else nosettlementButton.setChecked(true);
+                }
+            });
+
+        }
     }
 
     @Override
@@ -152,22 +167,30 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.start:
-                DatePickerDialogUtil.getInstance().showDatePickerDialog(this, startDate, new DatePickerDialogUtil.OnDateSelectedListener() {
+                DialogUtil.getInstance().showDatePickerDialog(this, startDate, new DialogUtil.OnDateSelectedListener() {
                     @Override
                     public void onDateSelected(long date) {
                         setStartText(date);
-                        adapter.notifyDataSetChangedWithSection(startDate, endDate);
-                        showContent();
+                        adapter.notifyDataSetChangedWithSection(startDate, endDate, new ListAdapter.NotifyListener() {
+                            @Override
+                            public void onNotifySuccess() {
+                                showContent();
+                            }
+                        });
                     }
                 });
                 break;
             case R.id.end:
-                DatePickerDialogUtil.getInstance().showDatePickerDialog(this, endDate, new DatePickerDialogUtil.OnDateSelectedListener() {
+                DialogUtil.getInstance().showDatePickerDialog(this, endDate, new DialogUtil.OnDateSelectedListener() {
                     @Override
                     public void onDateSelected(long date) {
                         setEndText(date);
-                        adapter.notifyDataSetChangedWithSection(startDate, endDate);
-                        showContent();
+                        adapter.notifyDataSetChangedWithSection(startDate, endDate, new ListAdapter.NotifyListener() {
+                            @Override
+                            public void onNotifySuccess() {
+                                showContent();
+                            }
+                        });
                     }
                 });
                 break;
@@ -178,13 +201,35 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         switch (buttonView.getId()) {
             case R.id.all:
-                Log.w("CJM", "onCheckedChanged:all:" + isChecked);
+                if (isChecked) {
+                    adapter.notifyDataSetChangedWithSection(startDate, endDate, new ListAdapter.NotifyListener() {
+                        @Override
+                        public void onNotifySuccess() {
+                            showContent();
+                        }
+                    });
+                }
+
                 break;
             case R.id.settlement:
-                Log.w("CJM", "onCheckedChanged:settlement:" + isChecked);
+                if (isChecked) {
+                    adapter.notifyDataSetChangedWithSection(startDate, endDate, true, new ListAdapter.NotifyListener() {
+                        @Override
+                        public void onNotifySuccess() {
+                            showContent();
+                        }
+                    });
+                }
                 break;
             case R.id.nosettlement:
-                Log.w("CJM", "onCheckedChanged:nosettlement:" + isChecked);
+                if (isChecked) {
+                    adapter.notifyDataSetChangedWithSection(startDate, endDate, false, new ListAdapter.NotifyListener() {
+                        @Override
+                        public void onNotifySuccess() {
+                            showContent();
+                        }
+                    });
+                }
                 break;
 
         }
