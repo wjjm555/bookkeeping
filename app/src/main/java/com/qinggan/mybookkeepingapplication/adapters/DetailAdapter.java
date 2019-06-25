@@ -1,6 +1,5 @@
 package com.qinggan.mybookkeepingapplication.adapters;
 
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,8 +12,6 @@ import com.qinggan.mybookkeepingapplication.model.Member;
 import com.qinggan.mybookkeepingapplication.utils.CalculationUtil;
 import com.qinggan.mybookkeepingapplication.utils.MemberUtil;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,16 +21,11 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.Holder> {
 
     private List<Integer> memberIds;
 
-    @IntDef({TYPE.AVERAGE, TYPE.ADVANCE, TYPE.COLLECTIONS, TYPE.PAYMENT})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Type {
-    }
-
     public static class TYPE {
         public static final int AVERAGE = 0, ADVANCE = 1, COLLECTIONS = 2, PAYMENT = 3;
     }
 
-    public DetailAdapter(@Type int type) {
+    public DetailAdapter(int type) {
         this.type = type;
         memberIds = new ArrayList<>();
         for (Member member : MemberUtil.getInstance().getMemberList()) {
