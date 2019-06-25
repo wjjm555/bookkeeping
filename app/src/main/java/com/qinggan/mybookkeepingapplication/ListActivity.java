@@ -6,19 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.qinggan.mybookkeepingapplication.adapters.ListAdapter;
 import com.qinggan.mybookkeepingapplication.model.Record;
-import com.qinggan.mybookkeepingapplication.utils.DBUtil;
-import com.qinggan.mybookkeepingapplication.utils.MemberUtil;
 import com.qinggan.mybookkeepingapplication.views.MyRecyclerView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ListActivity extends AppCompatActivity implements View.OnClickListener, MyRecyclerView.OnItemClickListener {
 

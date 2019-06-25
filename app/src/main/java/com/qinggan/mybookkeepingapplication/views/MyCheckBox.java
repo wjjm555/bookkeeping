@@ -109,10 +109,6 @@ public class MyCheckBox extends FrameLayout implements CompoundButton.OnCheckedC
             mOnCheckedChangeListener.onCheckedChanged(boxes.indexOf(buttonView), isChecked);
     }
 
-    public OnCheckedChangeListener getOnCheckedChangeListener() {
-        return mOnCheckedChangeListener;
-    }
-
     public void setOnCheckedChangeListener(OnCheckedChangeListener mOnCheckedChangeListener) {
         this.mOnCheckedChangeListener = mOnCheckedChangeListener;
     }

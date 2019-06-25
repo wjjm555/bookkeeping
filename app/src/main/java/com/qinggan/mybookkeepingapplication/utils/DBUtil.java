@@ -8,6 +8,7 @@ import android.os.Looper;
 import com.qinggan.mybookkeepingapplication.greendao.DaoMaster;
 import com.qinggan.mybookkeepingapplication.greendao.DaoSession;
 import com.qinggan.mybookkeepingapplication.greendao.RecordDao;
+import com.qinggan.mybookkeepingapplication.helper.MyOpenHelper;
 import com.qinggan.mybookkeepingapplication.model.Record;
 
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -31,7 +32,7 @@ public class DBUtil {
     private DaoSession daoSession;
 
     public void initDB(Context context) {
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, DB_NAME);
+        MyOpenHelper helper = new MyOpenHelper(context, DB_NAME);
         SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();

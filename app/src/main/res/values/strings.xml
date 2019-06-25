@@ -9,6 +9,7 @@
     <string name="title_fix">修改数据</string>
     <string name="title_detail">花费详情</string>
     <string name="title_settlement">花费结算</string>
+    <string name="title_settlement_detail">结算详情</string>
 
     <string name="hint_name">花费名称</string>
     <string name="hint_spend">花费金额</string>
@@ -34,6 +35,7 @@
     <string name="list_item_title">%s\t\t\t\t\t\t名称：%s</string>
 
     <string name="dialog_title">请输入管理密码！</string>
+    <string name="dialog_agent_title">请选择经办人</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
 
@@ -41,9 +43,20 @@
 
     <string name="settlement_start">开始日期：%s</string>
     <string name="settlement_end">结束日期：%s</string>
+    <string name="settlement_detail">结算详情</string>
 
     <string name="menu_settlement">全部结算</string>
     <string name="menu_reverse_settlement">全部取消结算</string>
 
     <string name="all">全部</string>
+
+    <string name="agent_empty">经办人：未设置</string>
+    <string name="agent_detail">经办人：%s</string>
+    <string name="agent">经办人</string>
+
+    <string name="personal_expenses">个人花费</string>
+    <string name="personal_advance">个人垫付</string>
+    <string name="personal_collections">待收款</string>
+    <string name="personal_payment">待结款</string>
+
 </resources>

@@ -10,6 +10,9 @@ public class Member {
 
     private float spend;
 
+
+    private float advancePayment;
+
     public Member(int id, String name) {
         this.id = id;
         this.name = name;
@@ -29,6 +32,18 @@ public class Member {
 
     public void setSpend(float spend) {
         this.spend = spend;
+    }
+
+    public float getAdvancePayment() {
+        return advancePayment;
+    }
+
+    public void setAdvancePayment(float advancePayment) {
+        this.advancePayment = advancePayment;
+    }
+
+    public void addAdvancePayment(float add) {
+        this.advancePayment = CalculationUtil.getInstance().add(advancePayment, add);
     }
 
     public void addSpend(float add) {

@@ -21,7 +21,7 @@ public class MemberUtil {
         public static final int CHEN = 0, ALICE = 1, LONG = 2, DI = 3, AI = 4, DOCTOR = 5, ZP = 6;
     }
 
-    private final String[] MembersName = {"建铭", "Alice", "晓龙", "宇迪", "艾哥", "医生", "扎鹏"};
+    public static final String[] MembersName = {"建铭", "Alice", "晓龙", "宇迪", "艾哥", "医生", "扎鹏"};
 
     private List<String> MemberNameList = new ArrayList<>(Arrays.asList(MembersName));
     private List<Member> memberList = new ArrayList<>();
@@ -56,6 +56,7 @@ public class MemberUtil {
     public void clearMemberSpend() {
         for (Member member : memberList) {
             member.setSpend(0);
+            member.setAdvancePayment(0);
         }
     }
 

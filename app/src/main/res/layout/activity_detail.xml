@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="10dp"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".DetailActivity">
 
     <Button
@@ -58,7 +58,7 @@
         android:imeOptions="actionNext"
         android:inputType="text"
         android:maxLines="1"
-        android:textSize="30sp"/>
+        android:textSize="30sp" />
 
     <EditText
         android:id="@+id/spend"
@@ -77,6 +77,17 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp" />
+
+    <TextView
+        android:id="@+id/agent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="@string/agent_empty"
+        android:textColor="@android:color/black"
+        android:textSize="30sp" />
 
     <TextView
         android:id="@+id/percapita"

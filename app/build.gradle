@@ -17,7 +17,7 @@ android {
         }
     }
     greendao {
-        schemaVersion 1 //数据库版本号
+        schemaVersion 3 //数据库版本号
         daoPackage 'com.qinggan.mybookkeepingapplication.greendao'
         targetGenDir 'src/main/java'
     }
@@ -35,4 +35,6 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
 
     implementation 'com.github.rey5137:material:1.2.5'
+
+    implementation 'io.github.yuweiguocn:GreenDaoUpgradeHelper:v2.2.1'
 }

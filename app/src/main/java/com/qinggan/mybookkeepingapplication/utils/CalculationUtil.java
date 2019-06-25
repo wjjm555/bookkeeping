@@ -25,4 +25,14 @@ public class CalculationUtil {
         BigDecimal bb = new BigDecimal(b);
         return ab.add(bb).floatValue();
     }
+
+    public float subtract(float a, float b) {
+        BigDecimal ab = new BigDecimal(a);
+        BigDecimal bb = new BigDecimal(b);
+        return ab.subtract(bb).floatValue();
+    }
+
+    public float subtractAbs(float a, float b) {
+        return Math.abs(subtract(a, b));
+    }
 }

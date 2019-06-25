@@ -1,9 +1,12 @@
 package com.qinggan.mybookkeepingapplication;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +29,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class SettlementActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class SettlementActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, MyRecyclerView.OnItemClickListener {
+
+    private final int REQUESTCODE_DETAIL = 0x1001;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
@@ -36,13 +41,13 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
 
     private ListAdapter adapter;
 
-    private TextView title;
+    private TextView title, detail;
 
     private RadioButton all, settlementButton, nosettlementButton;
 
     private long startDate, endDate;
 
-    private final int[] personId = {R.id.one, R.id.two, R.id.three, R.id.four, R.id.five, R.id.six, R.id.seven, R.id.eight};
+    private float total;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,7 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         endText = findViewById(R.id.end);
         title = findViewById(R.id.title);
         all = findViewById(R.id.all);
+        detail = findViewById(R.id.detail);
         settlementButton = findViewById(R.id.settlement);
         nosettlementButton = findViewById(R.id.nosettlement);
 
@@ -70,9 +76,11 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter = new ListAdapter());
+        recyclerView.setOnItemClickListener(this);
 
         startText.setOnClickListener(this);
         endText.setOnClickListener(this);
+        detail.setOnClickListener(this);
 
         Calendar calendar = Calendar.getInstance();
 
@@ -82,6 +90,14 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         setEndText(calendar.getTimeInMillis());
 
         all.setChecked(true);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUESTCODE_DETAIL && resultCode == RESULT_OK) {
+            all.setChecked(true);
+        }
     }
 
     private void setStartText(long date) {
@@ -96,27 +112,21 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
 
     private void showContent() {
         List<Record> records = adapter.getData();
-        float total = 0;
+        total = 0;
         if (records.size() > 0) {
             MemberUtil.getInstance().clearMemberSpend();
             for (Record record : records) {
                 if (record != null && record.getMembers() != null) {
+                    MemberUtil.getInstance().getMemberById(record.getAgent()).addAdvancePayment(record.getSpend());
                     total = CalculationUtil.getInstance().add(total, record.getSpend());
                     for (int memberId : record.getMembers()) {
                         MemberUtil.getInstance().getMemberById(memberId).addSpend(record.getAverage());
+
                     }
                 }
             }
-
-            title.setText(String.format(getString(R.string.total), total));
-            for (int i = 0; i < MemberUtil.getInstance().getMemberList().size(); ++i) {
-                Member member = MemberUtil.getInstance().getMemberList().get(i);
-                TextView textView = findViewById(personId[i]);
-                if (member != null && textView != null)
-                    textView.setText(String.format(getString(R.string.everyone_spend), member.getName(), member.getSpend()));
-            }
-
         }
+        title.setText(String.format(getString(R.string.total), total));
     }
 
     private void setSettlement(final boolean settlement) {
@@ -154,10 +164,28 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
                 this.finish();
                 break;
             case R.id.settlement:
-                setSettlement(true);
+                DialogUtil.getInstance().showPasswordDialog(this, new DialogUtil.OnPasswordConfirmClickListener() {
+                    @Override
+                    public void onConfirmClick(String password) {
+                        if (MyApplication.PASSWORD.toLowerCase().equals(password.trim().toLowerCase())) {
+                            setSettlement(true);
+                        } else {
+                            Snackbar.make(startText, getString(R.string.passwd_error), Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                });
                 break;
             case R.id.reverse:
-                setSettlement(false);
+                DialogUtil.getInstance().showPasswordDialog(this, new DialogUtil.OnPasswordConfirmClickListener() {
+                    @Override
+                    public void onConfirmClick(String password) {
+                        if (MyApplication.PASSWORD.toLowerCase().equals(password.trim().toLowerCase())) {
+                            setSettlement(false);
+                        } else {
+                            Snackbar.make(startText, getString(R.string.passwd_error), Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                });
                 break;
         }
         return true;
@@ -194,6 +222,11 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
                     }
                 });
                 break;
+            case R.id.detail:
+                Intent intent = new Intent(this, SettlementDetailActivityActivity.class);
+                intent.putExtra("total", total);
+                startActivity(intent);
+                break;
         }
     }
 
@@ -202,6 +235,7 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
         switch (buttonView.getId()) {
             case R.id.all:
                 if (isChecked) {
+                    detail.setEnabled(false);
                     adapter.notifyDataSetChangedWithSection(startDate, endDate, new ListAdapter.NotifyListener() {
                         @Override
                         public void onNotifySuccess() {
@@ -213,6 +247,7 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.settlement:
                 if (isChecked) {
+                    detail.setEnabled(false);
                     adapter.notifyDataSetChangedWithSection(startDate, endDate, true, new ListAdapter.NotifyListener() {
                         @Override
                         public void onNotifySuccess() {
@@ -223,6 +258,7 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.nosettlement:
                 if (isChecked) {
+                    detail.setEnabled(true);
                     adapter.notifyDataSetChangedWithSection(startDate, endDate, false, new ListAdapter.NotifyListener() {
                         @Override
                         public void onNotifySuccess() {
@@ -233,6 +269,22 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
                 break;
 
         }
+
+    }
+
+    @Override
+    public void onItemClick(RecyclerView recyclerView, View item, int position) {
+        Record record = adapter.getItem(position);
+        if (record != null) {
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.putExtra(DetailActivity.TYPE_KEY, DetailActivity.TYPE_DETAIL);
+            intent.putExtra(DetailActivity.ID_KEY, record.getId());
+            startActivityForResult(intent, REQUESTCODE_DETAIL);
+        }
+    }
+
+    @Override
+    public void onItemLongClick(RecyclerView recyclerView, View item, int position) {
 
     }
 }

@@ -33,7 +33,8 @@ public class RecordDao extends AbstractDao<Record, Long> {
         public final static Property Spend = new Property(3, float.class, "spend", false, "SPEND");
         public final static Property Name = new Property(4, String.class, "name", false, "NAME");
         public final static Property IsSettled = new Property(5, boolean.class, "isSettled", false, "IS_SETTLED");
-        public final static Property Members = new Property(6, String.class, "members", false, "MEMBERS");
+        public final static Property Agent = new Property(6, int.class, "agent", false, "AGENT");
+        public final static Property Members = new Property(7, String.class, "members", false, "MEMBERS");
     }
 
     private final MemberConvert membersConverter = new MemberConvert();
@@ -56,7 +57,8 @@ public class RecordDao extends AbstractDao<Record, Long> {
                 "\"SPEND\" REAL NOT NULL ," + // 3: spend
                 "\"NAME\" TEXT," + // 4: name
                 "\"IS_SETTLED\" INTEGER NOT NULL ," + // 5: isSettled
-                "\"MEMBERS\" TEXT);"); // 6: members
+                "\"AGENT\" INTEGER NOT NULL ," + // 6: agent
+                "\"MEMBERS\" TEXT);"); // 7: members
         // Add Indexes
         db.execSQL("CREATE INDEX " + constraint + "date ON \"RECORD\"" +
                 " (\"DATE\" ASC);");
@@ -87,10 +89,11 @@ public class RecordDao extends AbstractDao<Record, Long> {
             stmt.bindString(5, name);
         }
         stmt.bindLong(6, entity.getIsSettled() ? 1L: 0L);
+        stmt.bindLong(7, entity.getAgent());
  
         List members = entity.getMembers();
         if (members != null) {
-            stmt.bindString(7, membersConverter.convertToDatabaseValue(members));
+            stmt.bindString(8, membersConverter.convertToDatabaseValue(members));
         }
     }
 
@@ -111,10 +114,11 @@ public class RecordDao extends AbstractDao<Record, Long> {
             stmt.bindString(5, name);
         }
         stmt.bindLong(6, entity.getIsSettled() ? 1L: 0L);
+        stmt.bindLong(7, entity.getAgent());
  
         List members = entity.getMembers();
         if (members != null) {
-            stmt.bindString(7, membersConverter.convertToDatabaseValue(members));
+            stmt.bindString(8, membersConverter.convertToDatabaseValue(members));
         }
     }
 
@@ -132,7 +136,8 @@ public class RecordDao extends AbstractDao<Record, Long> {
             cursor.getFloat(offset + 3), // spend
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // name
             cursor.getShort(offset + 5) != 0, // isSettled
-            cursor.isNull(offset + 6) ? null : membersConverter.convertToEntityProperty(cursor.getString(offset + 6)) // members
+            cursor.getInt(offset + 6), // agent
+            cursor.isNull(offset + 7) ? null : membersConverter.convertToEntityProperty(cursor.getString(offset + 7)) // members
         );
         return entity;
     }
@@ -145,7 +150,8 @@ public class RecordDao extends AbstractDao<Record, Long> {
         entity.setSpend(cursor.getFloat(offset + 3));
         entity.setName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setIsSettled(cursor.getShort(offset + 5) != 0);
-        entity.setMembers(cursor.isNull(offset + 6) ? null : membersConverter.convertToEntityProperty(cursor.getString(offset + 6)));
+        entity.setAgent(cursor.getInt(offset + 6));
+        entity.setMembers(cursor.isNull(offset + 7) ? null : membersConverter.convertToEntityProperty(cursor.getString(offset + 7)));
      }
     
     @Override

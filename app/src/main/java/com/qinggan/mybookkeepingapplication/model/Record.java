@@ -5,8 +5,8 @@ import com.qinggan.mybookkeepingapplication.utils.CalculationUtil;
 
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.Transient;
 
@@ -20,7 +20,7 @@ public class Record {
 
     @Index(name = "date")
     private long date;
-    
+
     @Index(name = "type")
     private int type;
 
@@ -30,14 +30,16 @@ public class Record {
 
     private boolean isSettled = false;
 
+    private int agent;
+
     @Convert(converter = MemberConvert.class, columnType = String.class)
     private List<Integer> members = new ArrayList<>();
 
     @Transient
     private float average;
 
-    @Generated(hash = 336765368)
-    public Record(Long id, long date, int type, float spend, String name, boolean isSettled,
+    @Generated(hash = 1719369227)
+    public Record(Long id, long date, int type, float spend, String name, boolean isSettled, int agent,
             List<Integer> members) {
         this.id = id;
         this.date = date;
@@ -45,6 +47,7 @@ public class Record {
         this.spend = spend;
         this.name = name;
         this.isSettled = isSettled;
+        this.agent = agent;
         this.members = members;
     }
 
@@ -60,9 +63,15 @@ public class Record {
                 ", name='" + name + '\'' +
                 ", spend='" + spend + '\'' +
                 ", isSettled='" + isSettled + '\'' +
-                ", average='" + average + '\'' +
+                ", agent='" + agent + '\'' +
                 ", members='" + members.toString() + '\'' +
                 '}';
+    }
+
+    public float getAverage() {
+        if (average <= 0)
+            average = CalculationUtil.getInstance().getAverageSpend(getSpend(), getMembers().size());
+        return average;
     }
 
     public Long getId() {
@@ -79,6 +88,14 @@ public class Record {
 
     public void setDate(long date) {
         this.date = date;
+    }
+
+    public int getType() {
+        return this.type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public float getSpend() {
@@ -105,6 +122,14 @@ public class Record {
         this.isSettled = isSettled;
     }
 
+    public int getAgent() {
+        return this.agent;
+    }
+
+    public void setAgent(int agent) {
+        this.agent = agent;
+    }
+
     public List<Integer> getMembers() {
         return this.members;
     }
@@ -113,17 +138,7 @@ public class Record {
         this.members = members;
     }
 
-    public float getAverage() {
-        if (average <= 0)
-            average = CalculationUtil.getInstance().getAverageSpend(getSpend(), getMembers().size());
-        return average;
-    }
+   
 
-    public int getType() {
-        return this.type;
-    }
 
-    public void setType(int type) {
-        this.type = type;
-    }
 }
