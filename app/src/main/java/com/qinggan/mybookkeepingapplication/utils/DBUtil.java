@@ -111,7 +111,9 @@ public class DBUtil {
         new Thread() {
             @Override
             public void run() {
-                final List<Record> records = daoSession.loadAll(Record.class);
+                QueryBuilder<Record> qb = daoSession.queryBuilder(Record.class);
+                QueryBuilder<Record> recordQueryBuilder = qb.orderDesc(RecordDao.Properties.Date);
+                final List<Record> records = recordQueryBuilder.list();
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {

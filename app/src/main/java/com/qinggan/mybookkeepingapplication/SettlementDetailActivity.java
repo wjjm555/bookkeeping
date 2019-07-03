@@ -16,7 +16,7 @@ import com.qinggan.mybookkeepingapplication.utils.MemberUtil;
 
 import java.util.List;
 
-public class SettlementDetailActivityActivity extends AppCompatActivity {
+public class SettlementDetailActivity extends AppCompatActivity {
 
     private final int SPANCOUNT = 2;
 

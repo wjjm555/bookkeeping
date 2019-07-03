@@ -202,7 +202,7 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
                         adapter.notifyDataSetChangedWithSection(startDate, endDate, new ListAdapter.NotifyListener() {
                             @Override
                             public void onNotifySuccess() {
-                                showContent();
+                                all.setChecked(true);
                             }
                         });
                     }
@@ -216,14 +216,14 @@ public class SettlementActivity extends AppCompatActivity implements View.OnClic
                         adapter.notifyDataSetChangedWithSection(startDate, endDate, new ListAdapter.NotifyListener() {
                             @Override
                             public void onNotifySuccess() {
-                                showContent();
+                                all.setChecked(true);
                             }
                         });
                     }
                 });
                 break;
             case R.id.detail:
-                Intent intent = new Intent(this, SettlementDetailActivityActivity.class);
+                Intent intent = new Intent(this, SettlementDetailActivity.class);
                 intent.putExtra("total", total);
                 startActivity(intent);
                 break;
